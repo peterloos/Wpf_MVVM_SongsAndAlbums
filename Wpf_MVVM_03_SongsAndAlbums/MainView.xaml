@@ -1,0 +1,105 @@
+﻿<Window x:Class="Wpf_MVVM_03_SongsAndAlbums.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:WpfApplication.ViewModels"
+        xmlns:conv="clr-namespace:WpfApplicationConverters"
+        Title="My favorite Song Album" Height="350" Width="525">
+    
+    <Window.DataContext>
+        <local:AlbumViewModel/>
+    </Window.DataContext>
+    
+    <Window.Resources>
+        <conv:PassThroughConverter x:Key="PassThroughConverter"/>
+
+        <Style x:Key="LabelStyleArtist" TargetType="{x:Type Label}">
+            <Setter Property="Width" Value="160" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontFamily" Value="Arial" />
+        </Style>
+        <Style x:Key="LabelStyleTitle" TargetType="{x:Type Label}">
+            <Setter Property="FontStyle" Value="Italic" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontFamily" Value="Arial" />
+        </Style>
+    </Window.Resources>
+
+    <DockPanel LastChildFill="True">
+
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Test">
+                <MenuItem Header="Add new Artist"
+                          Command="{Binding CommandAddSongFromDatabase}" />
+                <MenuItem Header="Remove all Songs"
+                          Command="{Binding CommandRemoveAllSongs}" />
+            </MenuItem>
+        </Menu>
+
+        <GroupBox Header="Standard Application" DockPanel.Dock="Top" Margin="3">
+            <UniformGrid DockPanel.Dock="Top" Rows="0" Columns="3">
+                <Label Margin="3">Artist Name:</Label>
+                <TextBox Name="TextBoxArtistName" Margin="3"></TextBox>
+                <Button
+                    Content="Add Song"  Margin="3"
+                    Command="{Binding CommandAddSongManually}">
+                    <Button.CommandParameter>
+                        <MultiBinding StringFormat="[{0} {1}]"
+                            Converter="{StaticResource PassThroughConverter}">
+                            <Binding ElementName="TextBoxArtistName" Path="Text"/>
+                            <Binding ElementName="TextBoxSongTitle" Path="Text"/>
+                        </MultiBinding>
+                    </Button.CommandParameter>
+                </Button>
+                <Label Margin="3">Song Title:</Label>
+                <TextBox Name="TextBoxSongTitle" Margin="3"></TextBox>
+                <Button
+                    Content="Add Song from Database"
+                    Command="{Binding CommandAddSongFromDatabase}" Margin="3"/>
+                <Button
+                    Content="Remove Song"   Margin="3"
+                    CommandParameter="{Binding ElementName=ComboBoxRemoveSong, Path=SelectedItem.Content}"
+                    Command="{Binding CommandRemoveSong}"/>
+                <ComboBox SelectedIndex="0" Name="ComboBoxRemoveSong" Margin="3">
+                    <ComboBoxItem>1</ComboBoxItem>
+                    <ComboBoxItem>2</ComboBoxItem>
+                    <ComboBoxItem>3</ComboBoxItem>
+                    <ComboBoxItem>4</ComboBoxItem>
+                    <ComboBoxItem>5</ComboBoxItem>
+                </ComboBox>
+                <Button
+                    Content="Remove all Songs"
+                    Command="{Binding CommandRemoveAllSongs}" Margin="3" />
+            </UniformGrid>
+        </GroupBox>
+
+        <GroupBox Header="Unit Test" DockPanel.Dock="Top" Margin="3">
+            <StackPanel Orientation="Vertical">
+                <Button Name="ButtonTestAddSong"
+                    Content="Add new Song (Test)"
+                    Click="Button_Click" Margin="3"/>
+                <Button Name="ButtonTestUpdateArtist"
+                    Content="Update Name of Song (Test)"
+                    Click="Button_Click" Margin="3"/>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Header="Song Album" Margin="3">
+            <ListView Name="ListViewSongs"
+                      ItemsSource="{Binding Songs}"
+                      SelectionChanged="ListView_SelectionChanged">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel LastChildFill="True">
+                            <Label Content="{Binding ArtistName}"
+                                   Style="{StaticResource LabelStyleArtist}"
+                                   DockPanel.Dock="Left" />
+                            <Label Content="{Binding SongTitle}"
+                                   Style="{StaticResource LabelStyleTitle}"/>
+                        </DockPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </GroupBox>
+    </DockPanel>
+</Window>
